@@ -1,0 +1,66 @@
+package com.server.SqlFlexyCup;
+import java_cup.runtime.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import java.util.LinkedList;
+parser code {:
+
+    public static LinkedList<String> erroresSintacticos=new LinkedList();
+    public static List<String> col= new ArrayList<>();
+    public static List<String> path= new ArrayList<>();
+    public static List<String> cond= new ArrayList<>();
+    public static List<String> cadenas= new ArrayList<>();
+    // Connect this parser to a scanner!
+    public parser(SqlLexer lex) {
+	    super(lex);
+	  }
+
+    public void syntax_error(Symbol s) {
+           String lexema=s.value.toString();
+           int columna=s.right;
+           int fila=s.left;
+           System.out.println("Error Sintactico: "+lexema+" en fila: "+fila+" y columna: "+columna);
+           String err=lexema+"Error sintactico No se esperaba ese tokenn en fila: "+fila+" Columna: "+columna;
+
+           erroresSintacticos.add(err);
+        }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
+           String lexema=s.value.toString();
+           int columna=s.right;
+           int fila=s.left;
+           System.out.println("Error Sintactico: "+lexema+" en fila: "+fila+" y columna: "+columna);
+                      String err=lexema+"Error sintactico No se esperaba ese tokenn en fila: "+fila+" Columna: "+columna;
+
+                      erroresSintacticos.add(err);
+    }
+:}
+
+/* Terminals (tokens returned by the scanner). */
+terminal             COLSULT,VISITSITE,VISITPAGE,POPULAR,COMPONENT,TODOS,PARRAFO,TITULO,IMG,VID,MENU;
+terminal            COMA,PCOMA,STR;
+
+
+
+/* Non-terminals */
+non terminal     sql_query,tipo,tipoComp, recursivo;
+
+/* The grammar */
+
+
+start with sql_query;
+
+
+sql_query::= COLSULT:c tipo PCOMA {:System.out.println("Consulta "+c.toString());:}
+            ;
+tipo::= VISITSITE:v recursivo {: System.out.println("Visite "+v.toString());:}
+        |VISITPAGE recursivo
+        |POPULAR recursivo
+        |COMPONENT tipoComp STR
+        ;
+
+tipoComp::=TODOS |PARRAFO|TITULO|IMG|VID|MENU ;
+
+recursivo::=recursivo COMA STR:s{:cadenas.add(s.toString());:}
+            |STR:s{:cadenas.add(s.toString());:};
